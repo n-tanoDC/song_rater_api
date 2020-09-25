@@ -1,15 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const AdminBro = require ('./.adminbro/admin');
+const routes = require('./routes');
 
 const app = express();
 const port = 8000;
 
 app.use(AdminBro.admin.options.rootPath, AdminBro.router)
-
-app.get('/', async (req, res) => {
-  res.send('Hello world!');
-});
+app.use('/', routes);
 
 mongoose.connect('mongodb://localhost:27017/song_rater', {
   useNewUrlParser: true,

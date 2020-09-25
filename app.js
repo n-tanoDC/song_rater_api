@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const passport = require('passport');
 const AdminBro = require ('./.adminbro/admin');
 const routes = require('./routes');
 
@@ -16,4 +17,4 @@ mongoose.connect('mongodb://localhost:27017/song_rater', {
 });
 
 const db = mongoose.connection;
-db.once('open', () => app.listen(port));
+db.once('open', () => app.listen(port, () => console.log('Server started on port ' + port)));

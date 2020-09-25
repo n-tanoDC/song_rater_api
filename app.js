@@ -1,8 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const AdminBro = require ('./.adminbro/admin');
 
 const app = express();
 const port = 8000;
+
+app.use(AdminBro.admin.options.rootPath, AdminBro.router)
 
 app.get('/', async (req, res) => {
   res.send('Hello world!');

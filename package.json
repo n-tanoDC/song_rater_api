@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/n-tanoDC/song_rater_api#readme",
   "dependencies": {
+    "@admin-bro/express": "^3.0.0",
+    "@admin-bro/mongoose": "^1.0.0",
+    "admin-bro": "^3.2.5",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-formidable": "^1.2.0",

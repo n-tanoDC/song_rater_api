@@ -8,7 +8,8 @@ const userSchema = new Schema ({
   description: String,
   password: { type: String, required: true },
   created_at: { type: Date, default: Date.now },
-  favorites: [Number]
+  favorites: [Number],
+  isAdmin: { type: Boolean, default: false }
 });
 
 userSchema.pre('save', async function(next) {

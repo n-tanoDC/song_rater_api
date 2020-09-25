@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const passport = require('passport');
 const AdminBro = require ('./.adminbro/admin');
 const routes = require('./routes');
 

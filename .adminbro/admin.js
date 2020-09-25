@@ -13,6 +13,18 @@ const admin = new AdminBro({
   rootPath: '/admin',
 })
 
-const router = AdminBroExpress.buildRouter(admin);
+const router = AdminBroExpress.buildAuthenticatedRouter(admin, {
+  authenticate: async (username, password) => {
+    const user = await User.findOne({ username })
+    if (user) {
+      const validate = user.isValidPassword(password)
+      if (validate && user.isAdmin) {
+        return user
+      }
+    }
+    return false
+  },
+  cookiePassword: 'secret_password'
+});
 
 module.exports = { admin: admin, router: router }

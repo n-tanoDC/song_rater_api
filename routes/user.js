@@ -1,5 +1,5 @@
 const User = require('../models/User');
-
+const upload = require('../multer');
 const router = require('express').Router();
 
 router.route('/')
@@ -9,6 +9,11 @@ router.route('/')
       user: req.user,
       token: req.query.secret_token
     })
+  })
+  .post(upload.single('avatar'), async (req, res) => {
+    const avatar = req.file.filename;
+    await User.findByIdAndUpdate(req.user._id, { avatar: avatar })
+    res.send('POST OK')
   })
 
 router.route('/favorites')

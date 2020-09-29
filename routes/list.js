@@ -21,9 +21,19 @@ router.route('/:id')
   // get one list
   .get(async (req, res) => {
     const { id } = req.params; 
-    const list = await List.findOne({ _id: id});
+    const list = await List.findById(id);
     res.json(list);
   })
+  // add element to list
+  .post(async (req, res) => {
+    const { id } = req.params;
+    const { element_id } = req.body
+    const list = await List.findById(id);
+    list.elements.push(element_id)
+    await list.save()
+    res.send('POST OK');
+  })
+  // delete a list
   .delete(async (req, res) => {
     const { id } = req.params;
     await List.findByIdAndDelete(id)

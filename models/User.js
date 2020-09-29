@@ -8,7 +8,7 @@ const userSchema = new Schema ({
   description: String,
   password: { type: String, required: true },
   created_at: { type: Date, default: Date.now },
-  favorites: [Number],
+  favorites: [String],
   isAdmin: { type: Boolean, default: false }
 });
 

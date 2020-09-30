@@ -20,9 +20,7 @@ router.route('/favorites')
   // add an element to the user's favorites
   .post(async (req, res) => {
     const { id, element_id } = req.body;
-    const user = await User.findById(id)
-    user.favorites.push(element_id)
-    await user.save()
+    const update = await User.update({ _id: id }, { $addToSet: { favorites: element_id} })
     res.send('POST OK')
   })
   

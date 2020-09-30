@@ -40,13 +40,4 @@ router.route('/:id')
     res.send('DELETE OK')
   })
 
-router.route('/:username')
-  // get all lists of one user
-  .get(async (req, res) => {
-    const { username } = req.params
-    const user = await User.findOne({ username: username})
-    const lists = await List.find({ author: user._id })
-    res.json(lists)
-  })
-
 module.exports = router;

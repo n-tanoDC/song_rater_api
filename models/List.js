@@ -5,7 +5,7 @@ const listSchema = new Schema ( {
   title: { type: String, required: true },
   description : String,
   elements: [String],
-  author: { type: Schema.Types.ObjectId, ref: 'User' },
+  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   created_at: { type: Date, default: Date.now },
   likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });

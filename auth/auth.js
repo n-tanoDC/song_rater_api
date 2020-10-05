@@ -50,7 +50,7 @@ passport.use('login', new localStrategy(
 
 passport.use(new JWTstrategy(
   {
-    secretOrKey: 'TOP_SECRET',
+    secretOrKey: process.env.JWT_SECRET,
     jwtFromRequest: ExtractJwt.fromUrlQueryParameter('secret_token')
   },
   async (token, done) => {

@@ -13,6 +13,8 @@ router.use(bodyParser.json());
 
 router.use('/review', reviewRoutes)
 router.use('/auth', authRoutes)
-router.use('/user', passport.authenticate('jwt', { session: false }), userRoutes)
+router.use('/user', userRoutes)
 
 module.exports = router;
+
+//  passport.authenticate('jwt', { session: false }),

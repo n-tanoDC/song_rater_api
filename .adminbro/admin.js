@@ -4,12 +4,11 @@ const AdminBroMongoose = require('@admin-bro/mongoose');
 
 const Review = require('../models/Review')
 const User = require('../models/User')
-const List = require('../models/List')
 
 AdminBro.registerAdapter(AdminBroMongoose)
 
 const admin = new AdminBro({
-  resources: [Review, User, List],
+  resources: [Review, User],
   rootPath: '/admin',
 })
 

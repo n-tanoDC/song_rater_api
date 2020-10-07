@@ -31,13 +31,4 @@ router.route('/:id')
     res.send('DELETE OK')
   })
 
-router.route('/:username')
-  // get all reviews by one user
-  .get(async (req, res) => {
-    const { username } = req.params
-    const user = await User.findOne({ username: username})
-    const reviews = await Review.find({ author: user._id })
-    res.json(reviews)
-  })
-
 module.exports = router;

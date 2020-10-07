@@ -20,6 +20,16 @@ router.route('/:username/favorites')
     res.send('POST OK')
   })
 
+router.route('/:username/reviews')
+  // get all reviews for 1 user
+  .get(async (req, res) => {
+    const { username } = req.params;
+    const user = await User.findOne({ username })
+    const reviews = await Review.find({ author: user._id });
+    console.log(reviews)
+    res.json(reviews)
+})
+
 router.route('/account',  passport.authenticate('jwt', { session: false }))
   .get(async (req, res) => {
     res.json({

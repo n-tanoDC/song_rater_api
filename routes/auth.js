@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const Review = require('../models/Review');
 
 router.post('/signup', passport.authenticate('signup', { session: false }),
     async (req, res) => {
@@ -21,8 +22,9 @@ router.post('/login', async(req, res, next) => {
       req.login(user, { session: false }, async (error) => {
         if (error) return next(error)
         const body = { _id: user._id, username: user.username }
+        const reviews = await Review.find({ author: user._id })
         const token = jwt.sign({ user: body }, process.env.JWT_SECRET); // TODO: Secure the token secret
-        return res.json({ token, user });
+        return res.json({ token, user, reviews });
       })
     } catch (error) {
       return next(error)

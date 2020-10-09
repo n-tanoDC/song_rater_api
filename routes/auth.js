@@ -3,28 +3,35 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const Review = require('../models/Review');
 
-router.post('/signup', passport.authenticate('signup', { session: false }),
-    async (req, res) => {
-      res.json({
-        message: 'Signed up.',
-        user: req.user
-      })
+router.post('/signup', (req, res, next) => {
+  passport.authenticate('signup', (error, user) => {
+    if (error) {
+      // send 400 ('Bad request') and the error as json
+      return res.status(400).json({ error })
     }
-  )
+
+    if (!user) {
+      // send 500 ('Internal server error') if there's no error and no user
+      return res.sendStatus(500)
+    }
+
+    // if there's no error and a valid user, send 201 ('Created') and the user as json
+    return res.status(201).json({ user });
+  })(req, res, next)
+});
 
 router.post('/login', async(req, res, next) => {
   passport.authenticate('login', async (err, user) => {
     try {
       if (err || !user) {
-        const error = new Error('An error occurred.');
-        return next(error)
+        return err ? res.sendStatus(500) : res.sendStatus(401)
       }
       req.login(user, { session: false }, async (error) => {
         if (error) return next(error)
         const body = { _id: user._id, username: user.username }
         const reviews = await Review.find({ author: user._id })
-        const token = jwt.sign({ user: body }, process.env.JWT_SECRET); // TODO: Secure the token secret
-        return res.json({ token, user, reviews });
+        const token = jwt.sign({ user: body }, process.env.JWT_SECRET);
+        return res.status(200).json({ token, user, reviews });
       })
     } catch (error) {
       return next(error)

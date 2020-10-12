@@ -24,11 +24,7 @@ passport.use('signup', new localStrategy(
   async (req, username, password, done) => {
     try {
       const { email } = req.body;
-      const keys = { username, password }
-
-      if (email) {
-        keys.email = email;
-      }
+      const keys = { username, email, password }
       
       for (let [key, value] of Object.entries(keys)) {
         if (!validateData(value, key)) {
@@ -36,13 +32,14 @@ passport.use('signup', new localStrategy(
         }
       }
 
-      const user = await User.create({ email, username, password })
+      const user = await User.create(keys)
+      
       return done(null, user)
+
     } catch (err) {
       if (err.code === 11000) {
         return done({ type: 'duplicate', key: Object.keys(err.keyValue)[0] })
       }
-
       return done(err)
     }
   }
@@ -59,7 +56,7 @@ passport.use('login', new localStrategy(
         return done(null, false)
       }
 
-      const validate = user.isValidPassword(password)
+      const validate = await user.isValidPassword(password)
 
       if (!validate) {
         return done(null, false)

@@ -16,7 +16,8 @@ const router = AdminBroExpress.buildAuthenticatedRouter(admin, {
   authenticate: async (username, password) => {
     const user = await User.findOne({ username })
     if (user) {
-      const validate = user.isValidPassword(password)
+      const validate = await user.isValidPassword(password)
+      console.log(validate)
       if (validate && user.isAdmin) {
         return user
       }

@@ -15,8 +15,10 @@ router.post('/signup', (req, res, next) => {
       return res.sendStatus(500)
     }
 
-    // if there's no error and a valid user, send 201 ('Created') and the user as json
-    return res.status(201).json({ user });
+    // if there's no error and a valid user, send 201 ('Created') and the user as json and generate a JWT token
+    const { _id, username } = user;
+    const token = jwt.sign({ user: { _id, username } }, process.env.JWT_SECRET);
+    return res.status(201).json({ user, token });
   })(req, res, next)
 });
 

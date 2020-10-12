@@ -1,21 +1,24 @@
 const router = require('express').Router();
 const Review = require('../models/Review');
 const User = require('../models/User');
+const passport = require('passport');
 
 router.route('/')
   // get all reviews
   .get(async (req, res) => {
-    const reviews = await Review.find({}).populate('author')
+    const reviews = await Review.find({}).sort({ created_at: -1 }).populate('author')
     res.json(reviews)
   })
-  .post(async (req, res) => {
-    const { title, rating } = req.body
-    const review = new Review({
-      title: title,
-      rating: rating
-    })
-    await review.save()
-    res.send('POST OK')
+  .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+      const { title, rating, content, element, element_type } = req.body
+      const review = new Review({ title, content, rating, element, element_type, author: req.user._id })
+      await review.save()
+      res.sendStatus(201)
+    } catch (error) {
+      res.sendStatus(400)
+    }
+    
   })
 
 router.route('/:id')

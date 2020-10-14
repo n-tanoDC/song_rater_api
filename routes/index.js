@@ -11,9 +11,9 @@ require('../auth/auth')
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
-router.use('/review', reviewRoutes)
+router.use('/reviews', reviewRoutes)
 router.use('/auth', authRoutes)
-router.use('/user', userRoutes)
+router.use('/users', userRoutes)
 
 module.exports = router;
 

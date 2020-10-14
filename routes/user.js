@@ -8,26 +8,28 @@ router.route('/:username')
   .get(async (req, res) => {
     const { username } = req.params;
     let user = await User.findOne({ username }, '-password');
-    const reviews = await Review.find({ author: user._id });
-    res.json({ user, reviews });
-  })
-
-router.route('/:username/favorites')
-  // add an element to the user's favorites
-  .post(async (req, res) => {
-    const { id, element_id } = req.body;
-    await User.update({ _id: id }, { $addToSet: { favorites: element_id} })
-    res.send('POST OK')
+    res.json(user);
   })
 
 router.route('/:username/reviews')
   // get all reviews for 1 user
   .get(async (req, res) => {
+    const { page = 1, limit = 5 } = req.query
     const { username } = req.params;
     const user = await User.findOne({ username })
-    const reviews = await Review.find({ author: user._id });
-    console.log(reviews)
-    res.json(reviews)
+    const reviews = await Review.find({ author: user._id })
+      .populate('author')
+      .sort({ created_at: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec()
+    
+      const count = await Review.countDocuments()
+    // get total amount of pages possible with the limit defined in the request
+    const totalPages = Math.ceil(count / limit)
+    // generate a url for the next page if there's any page left
+    const next = page < totalPages ? (parseInt(page) + 1) : null
+    res.json({ reviews, next })
 })
 
 router.route('/account',  passport.authenticate('jwt', { session: false }))

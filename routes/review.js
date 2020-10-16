@@ -22,11 +22,13 @@ router.route('/')
   // post a review
   .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
-      const { title, rating, content, element, element_type } = req.body
-      const review = new Review({ title, content, rating, element, element_type, author: req.user._id })
+      const { title, rating, content, element } = req.body;
+      const author = req.user._id;
+      const review = new Review({ title, content, rating, element, author })
       await review.save()
       res.status(201).json(review)
     } catch (error) {
+      console.log(error);
       res.sendStatus(400)
     }
     

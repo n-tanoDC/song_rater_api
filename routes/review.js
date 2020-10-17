@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const Review = require('../models/Review');
-const passport = require('passport');
+const { authenticate } = require('../auth/functions');
 
 router.route('/')
   // get all reviews with pagination
@@ -20,7 +20,7 @@ router.route('/')
     res.json({ reviews, next })
   })
   // post a review
-  .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+  .post(authenticate, async (req, res) => {
     try {
       const { title, rating, content, element } = req.body;
       const author = req.user._id;

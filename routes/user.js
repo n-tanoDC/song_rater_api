@@ -41,6 +41,8 @@ router.route('/account')
       } catch (error) {
         if (error.code === 11000) {
           res.status(400).json({ type: 'duplicate', key: Object.keys(error.keyValue)[0] })
+        } else if (error.type === 'syntax') {
+          res.status(400).json(error) 
         } else {
           res.sendStatus(500)
         }

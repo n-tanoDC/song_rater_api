@@ -17,6 +17,7 @@ mongoose.connect('mongodb://' + db_host + ':' + db_port + '/' + db_name, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
+  useFindAndModify: false
 });
 
 const db = mongoose.connection;

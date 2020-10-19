@@ -3,7 +3,7 @@ const upload = require('../multer');
 const router = require('express').Router();
 const passport = require('passport');
 const Review = require('../models/Review');
-const { validator } = require('../auth/functions');
+const { validator, authenticate } = require('../auth/functions');
 
 router.route('/account')
   .put(passport.authenticate('jwt', { session: false }), upload.single('avatar'), 
@@ -28,9 +28,9 @@ router.route('/account')
           updatedUser.avatar = file.filename;
         }
 
-        // The password is automatically crypted on save(), so we have to check if it provided in the request body to act accordingly :
+        // The password is automatically crypted on save(), so we have to check if it is provided in the request body to act accordingly :
         // - We use save() if we want to hash a new password.
-        // - We use updateOne() if we dont want it to change.
+        // - We use updateOne() if we dont want the password to change.
         if (body.password) {
           await updatedUser.save();
         } else {
@@ -49,14 +49,14 @@ router.route('/account')
       }
     })
 
-router.route('/profile/:username')
+router.route('/:username')
   .get(async (req, res) => {
     const { username } = req.params;
-    let user = await User.findOne({ username }, '-password');
+    const user = await User.findOne({ username }, '-password');
     res.json(user);
   })
 
-router.route('/profile/:username/reviews')
+router.route('/:username/reviews')
   // get all reviews for 1 user
   .get(async (req, res) => {
     const { page = 1, limit = 5 } = req.query
@@ -76,5 +76,31 @@ router.route('/profile/:username/reviews')
     const next = page < totalPages ? (parseInt(page) + 1) : null
     res.json({ reviews, next })
 })
+
+router.route('/:username/:action')
+  .get(authenticate, async (req, res) => {
+    try {
+      const { username, action } = req.params;
+      let operator;
+      
+      switch (action) {
+        case 'follow': 
+          operator = '$addToSet';
+          break;
+        case 'unfollow':
+          operator = '$pull';
+          break;
+        default: 
+          throw new Error('action not supported')
+      }
+
+      const user = await User.findOneAndUpdate({ username }, { [operator]: { followers: req.user._id }})
+      await User.updateOne({ _id: req.user._id }, { [operator]: { following: user._id }})
+
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
+  })
 
 module.exports = router;

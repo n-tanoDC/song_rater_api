@@ -9,7 +9,8 @@ const userSchema = new Schema ({
   description: String,
   password: { type: String, required: true },
   created_at: { type: Date, default: Date.now },
-  favorites: [String],
+  followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   isAdmin: { type: Boolean, default: false }
 });
 
@@ -22,6 +23,5 @@ userSchema.methods.isValidPassword = async function(password) {
   const compare = await bcrypt.compare(password, this.password)
   return compare;
 }
-
 
 module.exports = mongoose.model('User', userSchema);

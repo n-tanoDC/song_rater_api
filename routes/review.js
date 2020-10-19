@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Review = require('../models/Review');
+const User = require('../models/User');
 const { authenticate } = require('../auth/functions');
 
 router.route('/')
@@ -23,13 +24,14 @@ router.route('/')
   .post(authenticate, async (req, res) => {
     try {
       const { title, rating, content, element } = req.body;
-      const author = req.user._id;
-      console.log(element);
-      const oldReview = await Review.findOne({ author, 'element.id': element.id })
-      console.log(oldReview);
+      const author = await User.findById(req.user._id);
+      
+      const oldReview = await Review.findOne({ author: author._id, 'element.id': element.id })
+      
       if (oldReview) {
         throw new Error('Already exists');
       }
+      
       const review = new Review({ title, content, rating, element, author })
       await review.save()
       res.status(201).json(review)

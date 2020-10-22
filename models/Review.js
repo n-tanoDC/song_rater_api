@@ -4,9 +4,10 @@ const Schema = mongoose.Schema;
 const reviewSchema = new Schema ( {
   title: String,
   content: String,
-  element: { 
+  media: { 
     id: String,
-    element_type: String,
+    link: String,
+    media_type: String,
     name: String,
     artists: [{
       id: String,

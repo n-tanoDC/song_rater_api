@@ -6,12 +6,11 @@ const Review = require('../models/Review');
 const { validator, authenticate } = require('../auth/functions');
 
 router.route('/account')
-  .put(passport.authenticate('jwt', { session: false }), upload.single('avatar'), 
+  .put(authenticate, upload.single('avatar'), 
     async (req, res) => {
       try {
         const { user, body, file } = req;
         let updatedUser = await User.findById(user._id).select('-password');
-
         // We update only the fields sent in the request body
         for (const [key, value] of Object.entries(body)) {
           updatedUser[key] = value

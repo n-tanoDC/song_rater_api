@@ -9,12 +9,10 @@ router.route('/account')
   .put(authenticate, upload.single('avatar'), 
     async (req, res) => {
       try {
-        const { user, body, file } = req;
-        let updatedUser = await User.findById(user._id).select('-password');
+        let { user, body, file } = req;
+        let updatedUser;
         // We update only the fields sent in the request body
         for (const [key, value] of Object.entries(body)) {
-          updatedUser[key] = value
-          // we check if the fields have the correct syntax
           if (key === 'username' || key === 'email' || key === 'password') {
             if (!validator(value, key)) {
               throw ({ type: 'syntax', key })
@@ -24,20 +22,21 @@ router.route('/account')
         
         // Update the avatar field only if a file is provided in the request
         if (file) {
-          updatedUser.avatar = file.filename;
+          body.avatar = file.filename;
         }
 
         // The password is automatically crypted on save(), so we have to check if it is provided in the request body to act accordingly :
         // - We use save() if we want to hash a new password.
         // - We use updateOne() if we dont want the password to change.
         if (body.password) {
-          await updatedUser.save();
+          console.log('Password modification not supported yet.');
         } else {
-          await User.updateOne(updatedUser);
+          updatedUser = await User.findByIdAndUpdate(user._id, body, { new: true });
         }
 
         res.json(updatedUser)
       } catch (error) {
+        console.log(error, error.message);
         if (error.code === 11000) {
           res.status(400).json({ type: 'duplicate', key: Object.keys(error.keyValue)[0] })
         } else if (error.type === 'syntax') {

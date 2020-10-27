@@ -8,16 +8,16 @@ router.route('/')
   .get(async (req, res) => {
     const { page = 1, limit = 10 } = req.query
     const reviews = await Review.find({})
-      .populate('author')
+      .populate('author', '-password -email -created_at -isAdmin -__v')
       .sort({ created_at: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
       .exec()
-      const count = await Review.countDocuments()
-      // get total amount of pages possible with the limit defined in the request
-      const totalPages = Math.ceil(count / limit)
-      // generate a url for the next page if there's any page left
-      const next = page < totalPages ? (parseInt(page) + 1) : null
+    const count = await Review.countDocuments()
+    // get total amount of pages possible with the limit defined in the request
+    const totalPages = Math.ceil(count / limit)
+    // generate a url for the next page if there's any page left
+    const next = page < totalPages ? (parseInt(page) + 1) : null
     res.json({ reviews, next })
   })
   // post a review

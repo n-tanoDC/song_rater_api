@@ -25,4 +25,4 @@ mongoose.connect('mongodb://' + db_host + ':' + db_port + '/' + db_name, {
 });
 
 const db = mongoose.connection;
-db.once('open', () => app.listen(port, hostname, () => console.log('Server started at ' + hostname + ':' + port)));
+db.once('open', () => app.listen(port, hostname, () => console.log('Server started at http://' + hostname + ':' + port)));

@@ -1,9 +1,18 @@
-const User = require('../models/User');
-const upload = require('../multer');
 const router = require('express').Router();
-const passport = require('passport');
+const fs = require('fs');
+const upload = require('../multer');
+
+const User = require('../models/User');
 const Review = require('../models/Review');
+
 const { validator, authenticate } = require('../auth/functions');
+
+const deletePreviousAvatar = user => {
+  const path = './uploads/' + user.avatar;
+  return fs.unlink(path, error => {
+    console.log(error);
+  })
+}
 
 router.route('/account')
   .put(authenticate, upload.single('avatar'), 
@@ -22,6 +31,10 @@ router.route('/account')
         
         // Update the avatar field only if a file is provided in the request
         if (file) {
+          // Delete the previous avatar if the user already has one
+          if (user.avatar) {
+            await deletePreviousAvatar(user)
+          }
           body.avatar = file.filename;
         }
 

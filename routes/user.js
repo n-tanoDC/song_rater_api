@@ -59,6 +59,15 @@ router.route('/account')
         }
       }
     })
+    .delete(authenticate, async (req, res) => {
+      try {
+        const deletedUser = await User.findByIdAndDelete(req.user._id)
+        res.json(deletedUser)
+      } catch (error) {
+        res.json(error)
+      }
+    })
+
 
 router.route('/:username')
   .get(async (req, res) => {

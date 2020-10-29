@@ -21,18 +21,17 @@ router.route('/')
   })
   .post(authenticate, async (req, res) => {
     try {
-      const { title, rating, content, media } = req.body;
-      
+      const { user, body } = req;
       // check if the user already posted a review on this specific content.
       // throw an Error if it is the case.
-      const oldReview = await Review.findOne({ author: req.user._id, 'media.id': media.id })
+      const oldReview = await Review.findOne({ author: user._id, 'media.id': body.media.id })
       
       if (oldReview) {
         throw new Error('duplicate');
       }
       
       // create a new Review with the request informations and save it.
-      const review = new Review({ title, content, rating, media, author })
+      const review = new Review({ ...body, author: user._id })
       await review.save()
 
       // send a status code 201 "Created", and the new review as JSON.

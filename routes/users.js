@@ -7,7 +7,7 @@ const Review = require('../models/Review');
 
 const { validator, authenticate } = require('../auth/functions');
 
-const deletePreviousAvatar = user => {
+const deleteAvatar = user => {
   const path = './uploads/' + user.avatar;
   return fs.unlink(path, error => {
     console.log(error);
@@ -33,7 +33,7 @@ router.route('/account')
         if (file) {
           // Delete the previous avatar if the user already has one
           if (user.avatar) {
-            await deletePreviousAvatar(user)
+            await deleteAvatar(user)
           }
           body.avatar = file.filename;
         }
@@ -61,8 +61,10 @@ router.route('/account')
     })
     .delete(authenticate, async (req, res) => {
       try {
-        const deletedUser = await User.findByIdAndDelete(req.user._id)
-        res.json(deletedUser)
+        const { user } = req;
+        await deleteAvatar(user);
+        await User.deleteOne({ _id: user._id })
+        res.json({ deletedUser: user })
       } catch (error) {
         res.json(error)
       }
@@ -101,21 +103,27 @@ router.route('/:username/:action')
   .get(authenticate, async (req, res) => {
     try {
       const { username, action } = req.params;
+      const { _id } = req.user;
+
       let operator;
       
+      // Define the operator to use depending on the action
       switch (action) {
         case 'follow': 
+          // Add an element to an array
           operator = '$addToSet';
           break;
         case 'unfollow':
+          // Remove an element from an array
           operator = '$pull';
           break;
         default: 
           throw new Error('action not supported')
       }
 
-      const user = await User.findOneAndUpdate({ username }, { [operator]: { followers: req.user._id }})
-      await User.updateOne({ _id: req.user._id }, { [operator]: { following: user._id }})
+      // Find user by username, apply operator to the corresponding array of data
+      const followedUser = await User.findOneAndUpdate({ username }, { [operator]: { followers: _id }})
+      await User.updateOne({ _id }, { [operator]: { following: followedUser._id }})
 
       res.sendStatus(200);
     } catch (error) {

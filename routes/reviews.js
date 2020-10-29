@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const Review = require('../models/Review');
-const User = require('../models/User');
 const { authenticate } = require('../auth/functions');
 
 router.route('/')
@@ -20,23 +19,27 @@ router.route('/')
     const next = page < totalPages ? (parseInt(page) + 1) : null
     res.json({ reviews, next })
   })
-  // post a review
   .post(authenticate, async (req, res) => {
     try {
       const { title, rating, content, media } = req.body;
-      const author = await User.findById(req.user._id);
       
-      const oldReview = await Review.findOne({ author: author._id, 'media.id': media.id })
+      // check if the user already posted a review on this specific content.
+      // throw an Error if it is the case.
+      const oldReview = await Review.findOne({ author: req.user._id, 'media.id': media.id })
       
       if (oldReview) {
-        throw new Error('Already exists');
+        throw new Error('duplicate');
       }
       
+      // create a new Review with the request informations and save it.
       const review = new Review({ title, content, rating, media, author })
       await review.save()
+
+      // send a status code 201 "Created", and the new review as JSON.
       res.status(201).json(review)
     } catch (error) {
-      const code = error.message === 'Already exists' ? 409 : 400;
+      // send a different code according to the error message.
+      const code = error.message === 'duplicate' ? 409 : 400;
       res.status(code).json(error)
     }
     

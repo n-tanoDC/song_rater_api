@@ -7,7 +7,6 @@ const routes = require('./routes');
 
 const app = express();
 
-const hostname = 'localhost';
 const port = 8000;
 const db_host = process.env.DB_HOST;
 const db_port = process.env.DB_PORT;
@@ -25,4 +24,4 @@ mongoose.connect('mongodb://' + db_host + ':' + db_port + '/' + db_name, {
 });
 
 const db = mongoose.connection;
-db.once('open', () => app.listen(port, hostname, () => console.log('Server started at http://' + hostname + ':' + port)));
+db.once('open', () => app.listen(port, () => console.log('Server started at http://localhost:' + port)));

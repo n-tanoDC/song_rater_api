@@ -6,6 +6,7 @@ const User = require('../models/User');
 const Review = require('../models/Review');
 
 const { validator, authenticate } = require('../auth/functions');
+const { findWithPagination } = require('./functions');
 
 const deleteAvatar = user => {
   const path = './uploads/' + user.avatar;
@@ -70,6 +71,18 @@ router.route('/account')
       }
     })
 
+  router.route('/account/following/reviews')
+    .get(authenticate, async (req, res) => {
+      try {
+        const { page = 1, limit = 5 } = req.query
+        const query = { author: { $in : req.user.following }}
+        const reviews = await findWithPagination(Review, query, page, limit)
+        res.json(reviews);
+      } catch (error) {
+        res.json(error);
+      }
+    })
+
 
 router.route('/:username')
   .get(async (req, res) => {
@@ -83,21 +96,12 @@ router.route('/:username/reviews')
   .get(async (req, res) => {
     const { page = 1, limit = 5 } = req.query
     const { username } = req.params;
-    const user = await User.findOne({ username })
-    const reviews = await Review.find({ author: user._id })
-      .populate('author')
-      .sort({ created_at: -1 })
-      .limit(limit)
-      .skip((page - 1) * limit)
-      .exec()
-    
-      const count = await Review.countDocuments()
-    // get total amount of pages possible with the limit defined in the request
-    const totalPages = Math.ceil(count / limit)
-    // generate a url for the next page if there's any page left
-    const next = page < totalPages ? (parseInt(page) + 1) : null
-    res.json({ reviews, next })
+    const user = await User.findOne({ username });
+    const query = { author: user._id };
+    const reviews = await findWithPagination(Review, query, page, limit);
+    res.json(reviews)
 })
+
 
 router.route('/:username/:action')
   .get(authenticate, async (req, res) => {

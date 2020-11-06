@@ -126,10 +126,10 @@ router.route('/:username/:action')
       }
 
       // Find user by username, apply operator to the corresponding array of data
-      const followedUser = await User.findOneAndUpdate({ username }, { [operator]: { followers: _id }})
-      await User.updateOne({ _id }, { [operator]: { following: followedUser._id }})
+      const followedUser = await User.findOneAndUpdate({ username }, { [operator]: { followers: _id }}, { new: true })
+      const updatedUser = await User.findByIdAndUpdate(_id, { [operator]: { following: followedUser._id }}, { new: true})
 
-      res.sendStatus(200);
+      res.json({ followedUser, updatedUser });
     } catch (error) {
       res.status(400).json({ message: error.message })
     }

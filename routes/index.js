@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const passport = require('passport');
 
 const reviewRoutes = require('./reviews');
 const userRoutes = require('./users');
@@ -12,6 +11,7 @@ const router = express.Router();
 
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
+
 router.use('/uploads', express.static('uploads'))
 
 router.use('/reviews', reviewRoutes)
@@ -24,5 +24,3 @@ router.route('/')
   })
 
 module.exports = router;
-
-//  passport.authenticate('jwt', { session: false }),

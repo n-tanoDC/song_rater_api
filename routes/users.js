@@ -5,7 +5,7 @@ const upload = require('../multer');
 const User = require('../models/User');
 const Review = require('../models/Review');
 
-const { validator, authenticate } = require('../auth/functions');
+const { authenticate, bodyValidator } = require('../auth/functions');
 const { findWithPagination } = require('./functions');
 
 const deleteAvatar = user => {
@@ -20,44 +20,31 @@ router.route('/account')
     async (req, res) => {
       try {
         let { user, body, file } = req;
-        let updatedUser;
-        // We update only the fields sent in the request body
-        for (const [key, value] of Object.entries(body)) {
-          if (key === 'username' || key === 'email' || key === 'password') {
-            if (!validator(value, key)) {
-              throw ({ type: 'syntax', key })
-            }
-          }
+
+        const { error } = (await bodyValidator(body));
+        
+        if (error) {
+          return res.status(400).json({ error })
         }
         
-        // Update the avatar field only if a file is provided in the request
+
         if (file) {
-          // Delete the previous avatar if the user already has one
           if (user.avatar) {
             await deleteAvatar(user)
           }
           body.avatar = file.filename;
         }
-
-        // The password is automatically crypted on save(), so we have to check if it is provided in the request body to act accordingly :
-        // - We use save() if we want to hash a new password.
-        // - We use updateOne() if we dont want the password to change.
+        
         if (body.password) {
-          console.log('Password modification not supported yet.');
-        } else {
-          updatedUser = await User.findByIdAndUpdate(user._id, body, { new: true });
+          return res.status(400).json({ error: 'Modification de mot de passe non supportée.' });
         }
+
+        const updatedUser = await User.findByIdAndUpdate(user._id, body, { new: true });
 
         res.json(updatedUser)
       } catch (error) {
-        console.log(error, error.message);
-        if (error.code === 11000) {
-          res.status(400).json({ type: 'duplicate', key: Object.keys(error.keyValue)[0] })
-        } else if (error.type === 'syntax') {
-          res.status(400).json(error) 
-        } else {
-          res.sendStatus(500)
-        }
+        console.log(error);
+        res.sendStatus(500)
       }
     })
     .delete(authenticate, async (req, res) => {

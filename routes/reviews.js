@@ -22,11 +22,9 @@ router.route('/')
         return res.status(400).json({ error });
       }
       
-      // create a new Review with the request informations and save it.
       const review = new Review({ ...body, author: user._id })
-      await review.save()
+      await review.save().then(review => review.populate({ path: 'author', select: 'username avatar' }).execPopulate())
 
-      // send a status code 201 "Created", and the new review as JSON.
       res.status(201).json(review)
     } catch (error) {
       console.log(error);

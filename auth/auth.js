@@ -2,7 +2,7 @@ const JWTStrategy = require('passport-jwt').Strategy;
 const User = require('../models/User');
 const passport = require('passport');
 const { ExtractJwt } = require('passport-jwt');
-const { bodyValidator } = require('./functions');
+const { bodyValidator } = require('../functions');
 const localStrategy = require('passport-local').Strategy;
 
 passport.use('signup', new localStrategy({ passReqToCallback: true },

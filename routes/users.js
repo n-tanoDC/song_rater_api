@@ -5,8 +5,7 @@ const upload = require('../multer');
 const User = require('../models/User');
 const Review = require('../models/Review');
 
-const { authenticate, bodyValidator } = require('../auth/functions');
-const { findWithPagination } = require('./functions');
+const { authenticate, bodyValidator, findWithPagination } = require('../functions');
 
 const deleteAvatar = user => {
   const path = './uploads/' + user.avatar;

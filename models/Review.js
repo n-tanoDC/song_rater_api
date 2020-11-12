@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const reviewSchema = new Schema ( {
-  title: String,
-  content: String,
+  title: { type: String, minlength: 5, maxlength: 70 },
+  content: { type: String, minlength: 10, maxlength: 5000 },
   media: { 
     id: String,
     link: String,

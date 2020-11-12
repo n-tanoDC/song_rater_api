@@ -1,7 +1,8 @@
 const router = require('express').Router();
+
 const Review = require('../models/Review');
-const { authenticate } = require('../auth/functions');
-const { findWithPagination } = require('./functions');
+
+const { findWithPagination, reviewValidator, authenticate } = require('../functions');
 
 router.route('/')
   // get all reviews with pagination
@@ -10,15 +11,15 @@ router.route('/')
     const reviews = await findWithPagination(Review, {}, page, limit);
     res.json(reviews)
   })
+  
   .post(authenticate, async (req, res) => {
     try {
-      const { user, body } = req;
-      // check if the user already posted a review on this specific content.
-      // throw an Error if it is the case.
-      const oldReview = await Review.findOne({ author: user._id, 'media.id': body.media.id })
+      const { body, user } = req;
       
-      if (oldReview) {
-        throw new Error('duplicate');
+      const { error } = await reviewValidator(body, user)
+
+      if (error) {
+        return res.status(400).json({ error });
       }
       
       // create a new Review with the request informations and save it.
@@ -28,9 +29,8 @@ router.route('/')
       // send a status code 201 "Created", and the new review as JSON.
       res.status(201).json(review)
     } catch (error) {
-      // send a different code according to the error message.
-      const code = error.message === 'duplicate' ? 409 : 400;
-      res.status(code).json(error)
+      console.log(error);
+      res.sendStatus(500);
     }
     
   })

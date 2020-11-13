@@ -1,10 +1,15 @@
-const passport = require("passport");
 const Review = require("./models/Review");
 const User = require('./models/User');
 
-const authenticate = passport.authenticate('jwt', { session: false })
 
-const fieldValidator = (value, type) => {
+exports.deleteAvatar = user => {
+  const path = './uploads/' + user.avatar;
+  return fs.unlink(path, error => {
+    console.log(error);
+  })
+}
+
+exports.fieldValidator = (value, type) => {
   const patterns = {
     // regular email pattern, ex : address@mail.com.
     email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
@@ -17,7 +22,7 @@ const fieldValidator = (value, type) => {
   return (patterns[type]).test(value);
 }
 
-const bodyValidator =  async body => {
+exports.bodyValidator =  async body => {
   const { username, email } = body;
   
   const keys = {
@@ -44,7 +49,7 @@ const bodyValidator =  async body => {
   return { error: null };
 }
 
-const findWithPagination = async (Model, query, page, limit) => {
+exports.findWithPagination = async (Model, query, page, limit) => {
   let sortValue = 'created_at',
       property = 'reviews';
 
@@ -71,7 +76,7 @@ const findWithPagination = async (Model, query, page, limit) => {
     return { [property]: results, next };
 }
 
-const reviewValidator = async (body, user) => {
+exports.reviewValidator = async (body, user) => {
   const { title, content, media, rating } = body;
 
   const oldReview = await Review.findOne({ author: user._id, 'media.id': media.id })
@@ -94,8 +99,3 @@ const reviewValidator = async (body, user) => {
 
   return { error: null };
 }
-
-exports.authenticate = authenticate;
-exports.bodyValidator = bodyValidator;
-exports.findWithPagination = findWithPagination;
-exports.reviewValidator = reviewValidator;

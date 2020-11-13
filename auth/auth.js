@@ -66,3 +66,5 @@ passport.use(new JWTStrategy(
     });
   }
 ));
+
+exports.checkAuth = passport.authenticate('jwt', { session: false })

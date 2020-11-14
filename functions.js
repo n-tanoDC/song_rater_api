@@ -2,14 +2,7 @@ const Review = require("./models/Review");
 const User = require('./models/User');
 
 
-exports.deleteAvatar = user => {
-  const path = './uploads/' + user.avatar;
-  return fs.unlink(path, error => {
-    console.log(error);
-  })
-}
-
-exports.fieldValidator = (value, type) => {
+const fieldValidator = (value, type) => {
   const patterns = {
     // regular email pattern, ex : address@mail.com.
     email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
@@ -21,6 +14,15 @@ exports.fieldValidator = (value, type) => {
   // return true of false if the value passed the test of the associated pattern
   return (patterns[type]).test(value);
 }
+
+
+exports.deleteAvatar = user => {
+  const path = './uploads/' + user.avatar;
+  return fs.unlink(path, error => {
+    console.log(error);
+  })
+}
+
 
 exports.bodyValidator =  async body => {
   const { username, email } = body;
@@ -65,7 +67,7 @@ exports.findWithPagination = async (Model, query, page, limit) => {
     .skip((page - 1) * limit)
     .exec();
 
-    const count = await Model.countDocuments()
+    const count = await Model.countDocuments(query)
 
     // get total amount of pages possible with the limit defined in the request
     const totalPages = Math.ceil(count / limit)

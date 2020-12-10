@@ -1,7 +1,7 @@
 const Review = require('../models/Review');
 const User = require('../models/User');
 
-const { findWithPagination, reviewValidator } = require('../functions');
+const { findWithPagination, reviewValidator, getMedia } = require('../functions');
 
 // Get all reviews
 exports.getAllReviews = async (req, res) => {
@@ -51,13 +51,14 @@ exports.createReview = async (req, res) => {
     if (error) {
       return res.status(400).json({ error });
     }
+
+    const media = await getMedia(body.media);
     
-    const review = new Review({ ...body, author: user._id })
+    const review = new Review({ ...body, media: media._id, author: user._id })
     await review.save().then(review => review.populate({ path: 'author', select: 'username avatar' }).execPopulate())
 
     res.status(201).json(review)
   } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
+    res.json(error);
   }
 };

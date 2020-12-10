@@ -1,6 +1,7 @@
 const Review = require("./models/Review");
 const User = require('./models/User');
 const fs = require('fs');
+const Media = require("./models/Media");
 
 
 const fieldValidator = (value, type) => {
@@ -62,7 +63,7 @@ exports.findWithPagination = async (Model, query, page, limit) => {
   }
 
   const results = await Model.find(query)
-    .populate('author', '-password -email -created_at -isAdmin -__v')
+    .populate('author media', '-password -email -created_at -isAdmin -__v')
     .sort({ [sortValue]: -1 })
     .limit(limit)
     .skip((page - 1) * limit)
@@ -102,3 +103,15 @@ exports.reviewValidator = async (body, user) => {
 
   return { error: null };
 }
+
+exports.getMedia = async (media) => {
+  let existingMedia = await Media.findOne({ id: media.id });
+
+  if (existingMedia) {
+    return existingMedia;
+  };
+
+  const newMedia = await Media.create(media)
+
+  return newMedia
+} 

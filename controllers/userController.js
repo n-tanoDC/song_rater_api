@@ -1,6 +1,7 @@
 const User = require('../models/User');
 
-const { bodyValidator, deleteAvatar } = require('../functions')
+const { bodyValidator, deleteAvatar, getMedia } = require('../functions');
+const Media = require('../models/Media');
 
 // Edit user info
 exports.editAccount = async (req, res) => {
@@ -84,3 +85,36 @@ exports.updateSubscription = async (req, res) => {
     res.status(400).json({ message: error.message })
   }
 };
+
+// Add an item to user's favorites
+exports.addToFavorites = async (req, res) => {
+  try {
+    const { user, body } = req;
+
+    const media = await getMedia(body)
+
+    const newUser = await User.findByIdAndUpdate(user._id, { $addToSet: { favorites: media._id }}, { new: true })
+      .populate({ path: 'favorites', model: 'Media' })
+
+    res.json(newUser.favorites)
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error.message })
+  }
+}
+
+// Remove an item from user's favorites
+exports.deleteFromFavorites = async (req, res) => {
+  try {
+    const { params, user } = req;
+
+    const media = await getMedia({ id: params.id })
+
+    const newUser = await User.findByIdAndUpdate(user._id, { $pull: { favorites: media._id }}, { new: true })
+      .populate({ path: 'favorites', model: 'Media' })
+
+    res.json(newUser.favorites)
+  } catch (error) {
+    res.json(error)
+  }
+}

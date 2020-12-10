@@ -3,12 +3,13 @@ const AdminBroExpress = require('@admin-bro/express');
 const AdminBroMongoose = require('@admin-bro/mongoose');
 
 const Review = require('../models/Review')
-const User = require('../models/User')
+const User = require('../models/User');
+const Media = require('../models/Media');
 
 AdminBro.registerAdapter(AdminBroMongoose)
 
 const admin = new AdminBro({
-  resources: [Review, User],
+  resources: [Review, User, Media],
   rootPath: '/admin',
 })
 

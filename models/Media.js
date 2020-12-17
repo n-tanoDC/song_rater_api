@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
 const Review = require('./Review');
 const User = require('./User');
-const Schema = mongoose.Schema;
+
+const functions = require('../functions');
 
 const mediaSchema = new Schema ({
   id: { type: String, required: true },
@@ -15,6 +18,11 @@ const mediaSchema = new Schema ({
   }],
   image: { type: String },
 });
+
+
+mediaSchema.methods.getReviews = async function(page, limit) {
+  return await functions.findWithPagination(Review, { media: this._id }, page, limit);
+}
 
 mediaSchema.methods.getPopularity = async function() {
   const popularity = await User.countDocuments({ 'favorites.id': this.id })

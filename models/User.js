@@ -2,10 +2,6 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Review = require('./Review');
-
-const { findWithPagination } = require('../functions');
-
 const userSchema = new Schema ({
   avatar: { type: String },
   username: { type: String, required: true, unique: true },
@@ -23,10 +19,6 @@ userSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, 10);
   next();
 })
-
-userSchema.methods.getReviews = async function(page, limit) {
-  return await findWithPagination(Review, { author: this._id }, page, limit);
-}
 
 userSchema.methods.isValidPassword = async function(password) {
   const compare = await bcrypt.compare(password, this.password)

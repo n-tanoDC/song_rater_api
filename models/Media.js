@@ -19,11 +19,6 @@ const mediaSchema = new Schema ({
   image: { type: String },
 });
 
-
-mediaSchema.methods.getReviews = async function(page, limit) {
-  return await functions.findWithPagination(Review, { media: this._id }, page, limit);
-}
-
 mediaSchema.methods.getPopularity = async function() {
   const popularity = await User.countDocuments({ 'favorites.id': this.id })
   return popularity;

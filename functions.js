@@ -81,10 +81,10 @@ exports.findWithPagination = async (Model, query, page, limit) => {
 }
 
 exports.reviewValidator = async (body, user) => {
-  const { title, content, media, rating } = body;
+  const { title, content, rating } = body;
+  const media = await Media.findOne({ id: body.media.id });
 
-  const oldReview = await Review.findOne({ author: user._id, 'media.id': media.id })
-
+  const oldReview = await Review.findOne({ author: user._id, media: media._id })
   if (oldReview) {
     return { error: 'Vous avez déjà publié une critique sur ce contenu.' };
   }

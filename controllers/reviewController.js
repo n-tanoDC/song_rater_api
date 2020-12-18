@@ -48,7 +48,6 @@ exports.getReviewsBySubscriptions = async (req, res) => {
 exports.createReview = async (req, res) => {
   try {
     const { body, user } = req;
-    
     const { error } = await reviewValidator(body, user)
 
     if (error) {
@@ -58,7 +57,11 @@ exports.createReview = async (req, res) => {
     const media = await getMedia(body.media);
     
     const review = new Review({ ...body, media: media._id, author: user._id })
-    await review.save().then(review => review.populate({ path: 'author', select: 'username avatar' }).execPopulate())
+    await review.save()
+      .then(review => review.populate({ path: 'author', select: 'username avatar' })
+        .populate({ path: 'media' })
+        .execPopulate()
+      )
 
     res.status(201).json(review)
   } catch (error) {

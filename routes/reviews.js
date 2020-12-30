@@ -9,6 +9,12 @@ router.route('/')
   .get(controller.getAllReviews)
   .post(checkAuth, controller.createReview)
 
+router.route('/upvote/:id')
+  .get(checkAuth, controller.upvote)
+
+router.route('/downvote/:id')
+  .get(checkAuth, controller.downvote)
+
 router.route('/subscriptions')
   .get(checkAuth, controller.getReviewsBySubscriptions)
 

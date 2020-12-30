@@ -63,7 +63,12 @@ exports.findWithPagination = async (Model, query, page, limit) => {
   }
 
   const results = await Model.find(query)
-    .populate('author media', '-password -email -created_at -isAdmin -__v')
+    .populate({ 
+      path: 'author', 
+      select: '-password -email -created_at -isAdmin -__v',
+      populate: { path: 'favorites', model: 'Media' }
+    })
+    .populate('media')
     .sort({ [sortValue]: -1 })
     .limit(limit)
     .skip((page - 1) * limit)

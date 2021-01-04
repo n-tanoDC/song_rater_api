@@ -1,7 +1,8 @@
-const Review = require("./models/Review");
-const User = require('./models/User');
 const fs = require('fs');
-const Media = require("./models/Media");
+
+const Review = require('./models/Review');
+const User = require('./models/User');
+const Media = require('./models/Media');
 
 
 const fieldValidator = (value, type) => {
@@ -88,12 +89,15 @@ exports.findWithPagination = async (Model, query, page, limit) => {
 exports.reviewValidator = async (body, user) => {
   const { title, content, rating } = body;
   const media = await Media.findOne({ id: body.media.id });
-
-  const oldReview = await Review.findOne({ author: user._id, media: media._id })
-  if (oldReview) {
-    return { error: 'Vous avez déjà publié une critique sur ce contenu.' };
+  
+  if (media) {
+    const oldReview = await Review.findOne({ author: user._id, media: media._id })
+    
+    if (oldReview) {
+      return { error: 'Vous avez déjà publié une critique sur ce contenu.' };
+    }
   }
-
+  
   if (rating > 10 || rating < 1) {
     return { error: 'La note doit être comprise entre 1 et 10 inclus.' };
   }

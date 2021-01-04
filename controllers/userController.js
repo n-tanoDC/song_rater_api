@@ -1,7 +1,6 @@
 const User = require('../models/User');
 
 const { bodyValidator, deleteAvatar, getMedia } = require('../functions');
-const Media = require('../models/Media');
 
 // Edit user info
 exports.editAccount = async (req, res) => {

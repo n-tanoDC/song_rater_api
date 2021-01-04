@@ -91,6 +91,6 @@ exports.createReview = async (req, res) => {
 
     res.status(201).json(review)
   } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
   }
 };

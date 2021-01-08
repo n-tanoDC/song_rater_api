@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const { removeItem } = require('../functions');
-
 const reviewSchema = new Schema ( {
   title: { type: String, minlength: 5, maxlength: 70 },
   content: { type: String, minlength: 10, maxlength: 5000 },
@@ -32,6 +30,14 @@ reviewSchema.methods.downvote = async function(id) {
     this.downvotes.push(id)
   }
   this.save()
+}
+
+const removeItem = (array, item) => {
+  const index = array.indexOf(item)
+  if (index !== -1) {
+    array.splice(index, 1)
+  }
+  return array
 }
 
 module.exports = mongoose.model('Review', reviewSchema);

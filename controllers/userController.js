@@ -25,8 +25,11 @@ exports.editAccount = async (req, res) => {
       return res.status(400).json({ error: 'Modification de mot de passe non supportée.' });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(user._id, body, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(user._id, body, { new: true })
+      .populate({ path: 'favorites', model: 'Media'})
+      .exec();
 
+    console.log(updatedUser);
     res.json(updatedUser)
   } catch (error) {
     console.log(error);

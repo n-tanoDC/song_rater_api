@@ -6,7 +6,6 @@ const userSchema = new Schema ({
   avatar: { type: String },
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
-  description: String,
   favorites: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   password: { type: String, required: true },
   created_at: { type: Date, default: Date.now },

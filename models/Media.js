@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Review = require('./Review');
 const User = require('./User');
 
 const mediaSchema = new Schema ({

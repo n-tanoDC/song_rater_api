@@ -4,6 +4,50 @@ const Media = require('../models/Media');
 
 const { findWithPagination, reviewValidator, getMedia } = require('../functions');
 
+exports.getRandomReviews = async (req, res) => {
+  try {
+    const reviews = await Review.aggregate([{ 
+        $sample: { size: 5 }
+      }, {
+        $lookup: {
+          from: 'media',
+          localField: 'media',
+          foreignField: '_id',
+          as: 'media'
+        }
+      }, {
+        $lookup: {
+          from: 'users',
+          let: { 'author': '$author'},
+          pipeline: [
+            {
+              $match: { $expr: { $eq: [ "$$author", "$_id" ]}}
+            },{
+            $project: {
+              password: 0,
+              email: 0
+            }
+          }],
+          as: 'author'
+        }
+      }
+    ])
+    let newReviews = [];
+    for (const review of reviews) {
+      newReviews.push({ 
+        ...review,
+        author: review.author[0], 
+        media: review.media[0] 
+      })
+    }
+
+    console.log(newReviews);
+    res.json(newReviews)
+  } catch (error) {
+    console.log(error);
+    res.json(error)
+  }
+}
 exports.upvote = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id)

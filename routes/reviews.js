@@ -61,6 +61,10 @@ router.route('/')
   .get(controller.getAllReviews)
   .post(checkAuth, controller.createReview)
 
+  
+router.route('/random')
+  .get(controller.getRandomReviews)
+
 
 router.route('/upvote/:id')
   .get(checkAuth, controller.upvote)

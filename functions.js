@@ -54,13 +54,18 @@ exports.bodyValidator =  async body => {
   return { error: null };
 }
 
-exports.findWithPagination = async (Model, query, page, limit) => {
-  let sortValue = 'created_at',
-      property = 'reviews';
-
-  if (Model === User) {
-    sortValue = 'followers';
-    property = 'users'
+exports.findWithPagination = async (Model, query, page, limit, sortValue = 'created_at') => {
+  let sortQuery; 
+  
+  switch (sortValue) {
+    case 'upvotes':
+      sortQuery = { averageVote: -1 };
+      break;
+    case 'downvotes':
+      sortQuery = { averageVote: 1 };
+      break;
+    default:
+      sortQuery= { created_at: -1 }
   }
 
   const results = await Model.find(query)
@@ -70,7 +75,7 @@ exports.findWithPagination = async (Model, query, page, limit) => {
       populate: { path: 'favorites', model: 'Media' }
     })
     .populate('media')
-    .sort({ [sortValue]: -1 })
+    .sort(sortQuery)
     .limit(limit)
     .skip((page - 1) * limit)
     .exec();
@@ -83,7 +88,7 @@ exports.findWithPagination = async (Model, query, page, limit) => {
     // generate next page number if there's one
     const next = page < totalPages ? (parseInt(page) + 1) : null
     
-    return { [property]: results, next };
+    return { reviews: results, next };
 }
 
 exports.reviewValidator = async (body, user) => {

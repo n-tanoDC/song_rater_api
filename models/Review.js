@@ -7,6 +7,7 @@ const reviewSchema = new Schema ( {
   media: { type: Schema.Types.ObjectId, ref: 'Media' },
   created_at: { type: Date, default: Date.now },
   rating: { type: Number, min: 1, max: 10, required: true },
+  averageVote: { type: Number, default: 0 },
   upvotes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   downvotes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   author: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -19,6 +20,7 @@ reviewSchema.methods.upvote = async function(id) {
     removeItem(this.downvotes, id)
     this.upvotes.push(id)
   }
+  this.averageVote = this.upvotes.length + (-this.downvotes.length);
   this.save()
 }
 
@@ -29,6 +31,7 @@ reviewSchema.methods.downvote = async function(id) {
     removeItem(this.upvotes, id)
     this.downvotes.push(id)
   }
+  this.averageVote = this.upvotes.length + (-this.downvotes.length);
   this.save()
 }
 

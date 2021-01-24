@@ -9,6 +9,7 @@ exports.upvote = async (req, res) => {
     const review = await Review.findById(req.params.id)
     review.upvote(req.user._id)
     res.json({ 
+      averageVote: review.averageVote,
       upvotes: review.upvotes,
       downvotes: review.downvotes,
     })
@@ -20,8 +21,9 @@ exports.upvote = async (req, res) => {
 exports.downvote = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id)
-    review.downvote(req.user._id)
+    await review.downvote(req.user._id)
     res.json({ 
+      averageVote: review.averageVote,
       upvotes: review.upvotes,
       downvotes: review.downvotes,
     })
@@ -32,26 +34,26 @@ exports.downvote = async (req, res) => {
 
 // Get all reviews
 exports.getAllReviews = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query
-  const reviews = await findWithPagination(Review, {}, page, limit);
+  const { page = 1, limit = 10, sortValue } = req.query
+  const reviews = await findWithPagination(Review, {}, page, limit, sortValue);
   res.json(reviews)
 };
 
 // Get all reviews for one user
 exports.getReviewsForOneUser = async (req, res) => {
-  const { page = 1, limit = 5 } = req.query
+  const { page = 1, limit = 5, sortValue } = req.query
   const { username } = req.params;
   const user = await User.findOne({ username });
-  const reviews = await findWithPagination(Review, { author: user._id }, page, limit)
+  const reviews = await findWithPagination(Review, { author: user._id }, page, limit, sortValue)
   res.json(reviews)
 };
 
 // Get all reviews for one media
 exports.getReviewsForOneMedia = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query
+  const { page = 1, limit = 10, sortValue} = req.query
   const media = await Media.findOne({ id: req.params.id })
   if (media) {
-    const reviews = await findWithPagination(Review, { media: media._id }, page, limit);
+    const reviews = await findWithPagination(Review, { media: media._id }, page, limit, sortValue);
     return res.json(reviews)
   } else {
     return res.json([])
@@ -61,9 +63,9 @@ exports.getReviewsForOneMedia = async (req, res) => {
 // Get all reviews for user's subscriptions
 exports.getReviewsBySubscriptions = async (req, res) => {
   try {
-    const { page = 1, limit = 5 } = req.query
+    const { page = 1, limit = 5, sortValue } = req.query
     const query = { author: { $in : req.user.following }}
-    const reviews = await findWithPagination(Review, query, page, limit)
+    const reviews = await findWithPagination(Review, query, page, limit, sortValue)
     res.json(reviews);
   } catch (error) {
     res.json(error);

@@ -16,6 +16,10 @@ exports.getRandomReviews = async (req, res) => {
           as: 'media'
         }
       }, {
+        $unwind: {
+          path: '$media'
+        }
+      },{
         $lookup: {
           from: 'users',
           let: { 'author': '$author'},
@@ -23,26 +27,28 @@ exports.getRandomReviews = async (req, res) => {
             {
               $match: { $expr: { $eq: [ "$$author", "$_id" ]}}
             },{
-            $project: {
-              password: 0,
-              email: 0
-            }
+              $lookup: {
+                from: 'media',
+                localField: 'favorites',
+                foreignField: '_id',
+                as: 'favorites'
+              }
+            },{
+              $project: {
+                password: 0,
+                email: 0
+              }
           }],
           as: 'author'
         }
+      }, { 
+        $unwind: {
+          path: '$author'
+        }
       }
     ])
-    let newReviews = [];
-    for (const review of reviews) {
-      newReviews.push({ 
-        ...review,
-        author: review.author[0], 
-        media: review.media[0] 
-      })
-    }
-
-    console.log(newReviews);
-    res.json(newReviews)
+    
+    res.json(reviews)
   } catch (error) {
     console.log(error);
     res.json(error)

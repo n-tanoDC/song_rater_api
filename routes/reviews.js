@@ -1,9 +1,3 @@
-const router = require('express').Router();
-
-const { checkAuth } = require('../auth/auth');
-
-const controller = require('../controllers/reviewController');
-
 /**
  * @swagger
  *  /reviews:
@@ -57,11 +51,22 @@ const controller = require('../controllers/reviewController');
  *          $ref: '#/components/responses/UnauthorizedError'
  *                
  */
+
+const router = require('express').Router();
+
+const { checkAuth } = require('../auth/auth');
+
+const controller = require('../controllers/reviewController');
+
 router.route('/')
   .get(controller.getAllReviews)
   .post(checkAuth, controller.createReview)
 
   
+router.route('/delete/:id')
+  .get(checkAuth, controller.deleteReview)
+
+
 router.route('/random')
   .get(controller.getRandomReviews)
 

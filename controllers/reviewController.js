@@ -146,3 +146,25 @@ exports.createReview = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+// Delete a review
+exports.deleteReview = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id)
+
+    if (!review) {
+      console.log('cant find');
+      return res.status(404).json({ error: 'Critique introuvable' })
+    }
+
+    if (!req.user.equals(review.author._id)) {
+      console.log('not allowed');
+      return res.status(404).json({ error: 'Vous ne pouvez pas supprimer cette critique.' })
+    }
+
+    await review.deleteOne()
+    res.sendStatus(204)
+  } catch (error) {
+    res.status(500).json({ error })
+  }
+}

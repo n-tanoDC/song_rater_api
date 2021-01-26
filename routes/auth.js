@@ -1,8 +1,3 @@
-const router = require('express').Router();
-const controller = require('../controllers/authController');
-
-router.post('/signup', controller.signup);
-
 /**
  * @swagger
  *  /auth/login:
@@ -31,6 +26,12 @@ router.post('/signup', controller.signup);
  *                 token:
  *                   type: string
  */
+
+const router = require('express').Router();
+const controller = require('../controllers/authController');
+
+router.post('/signup', controller.signup);
+
 router.post('/login', controller.login)
 
 module.exports = router;
